@@ -50,6 +50,23 @@ for msg in consumerComments:
     except:
         print("Could not insert into MongoDB")
 
+    try:
+        agg_result = db.comments_info.aggregate(
+            [{
+                "$group" : { "_id" : "$publication",
+                             "total":{"$sum":1}
+                            }
+            }]
+        )
+        db.comments_summary.delete_many({})
+        for i in agg_result:
+            print(i)
+            summary_id = db.comments_summary.insert_one(i)
+            print("Summary inserted with record ids", summary_id)
+    except Exception as e:
+        print(f'group by caught {type(e)}: ')
+        print(e)
+        print("Could not insert into MongoDB")
 
 
 #Esto es el profe
